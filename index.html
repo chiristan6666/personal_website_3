@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer Portfolio | Chris Tan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f8f8;
+            --text-color: #000;
+            --accent-color: #4f46e5; 
+            --foam-color: #818cf8;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--bg-color);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* 点阵底纹背景 — 自适应屏幕分辨率 */
+        .halftone-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: radial-gradient(var(--text-color) clamp(0.4px, 0.05vw, 1.2px), transparent clamp(0.4px, 0.05vw, 1.2px));
+            background-size: clamp(4px, 0.4vw, 10px) clamp(4px, 0.4vw, 10px);
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        #progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            background: var(--accent-color);
+            z-index: 2000;
+        }
+
+        .tech-border {
+            border: 1px solid rgba(0,0,0,0.1);
+            position: relative;
+            background-color: rgba(248, 248, 248, 0.5); 
+        }
+        .tech-tag {
+            position: absolute;
+            top: -10px; left: 10px;
+            background: var(--bg-color);
+            padding: 0 5px;
+            font-size: 10px;
+            color: #999;
+            z-index: 10;
+        }
+
+        .ascii-title {
+            line-height: 0.85;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+        }
+
+        /* 导航链接动效 */
+        .nav-link {
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            opacity: 0.4;
+            display: inline-block;
+            transform-origin: right top;
+            color: #000000 !important; 
+            text-decoration: none;
+        }
+        
+        .nav-link:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .nav-link.active {
+            opacity: 1;
+            transform: scale(1.15); 
+            color: #000000 !important;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1.5px;
+            background-color: #000000;
+            transition: width 0.4s ease;
+        }
+        
+        .nav-link.active::after { width: 100%; }
+
+        /* 品牌区域 */
+        .logo-blend {
+            position: fixed;
+            top: 32px;
+            left: 32px;
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            mix-blend-mode: difference;
+        }
+        .logo-blend h1 {
+            color: #ffffff !important;
+        }
+        .logo-blend img {
+            filter: invert(1);
+        }
+        @media (max-width: 768px) { .logo-blend { top: 16px; left: 16px; gap: 10px; } }
+
+        .carousel-desc {
+            display: none;
+        }
+        .carousel-desc-panel {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transition: opacity 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: none;
+            padding-top: 0.75rem;
+        }
+        .carousel-desc-panel.show {
+            opacity: 1;
+        }
+
+        .proj-overlay-text {
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .group:hover .proj-overlay-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-fade {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .scroll-fade.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        section { scroll-margin-top: 100px; }
+
+        /* 标题渐显动画 */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes fadeIn80 {
+            0% { opacity: 0; }
+            100% { opacity: 0.8; }
+        }
+
+        .scroll-hint {
+            opacity: 0;
+            animation: fadeIn80 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            animation-delay: 1.6s;
+        }
+
+        @keyframes shake {
+            0%, 100% { opacity: 1; transform: translateX(0); }
+            25% { opacity: 1; transform: translateX(-2px) rotate(-0.5deg); }
+            50% { opacity: 1; transform: translateX(2px) rotate(0.5deg); }
+            75% { opacity: 1; transform: translateX(-1px) rotate(-0.25deg); }
+        }
+
+        .btn-download {
+            opacity: 0;
+            animation: fadeIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            animation-delay: 1.2s;
+        }
+
+        .hero-title {
+            opacity: 0;
+            animation: fadeInUp 2.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        .hero-subtitle {
+            opacity: 0;
+            animation: fadeIn80 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            animation-delay: 0.8s;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--text-color); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="progress"></div>
+    <div class="halftone-overlay"></div>
+
+    <!-- 顶部品牌区域 (Logo 预留) -->
+    <div class="logo-blend">
+        <img src="logo.png" alt="Logo" class="h-4 w-auto select-none">
+        <h1 class="font-black text-base tracking-widest uppercase leading-none italic select-none">CHRIS.T</h1>
+    </div>
+
+    <nav class="fixed top-0 left-0 w-full p-4 md:p-8 flex justify-end items-start z-[1000] pointer-events-none">
+        <div class="flex flex-col items-end gap-3 pointer-events-auto mono text-[10px]">
+            <a href="#home" class="nav-link" data-section="home">首页 HOME_01</a>
+            <!-- 更新导航文案 -->
+            <a href="#resume" class="nav-link" data-section="resume">关于 ABOUT ME_02</a>
+            <a href="#work" class="nav-link" data-section="work">作品 PROJECT_03</a>
+            <a href="#about" class="nav-link" data-section="about">联系 CONTACT_04</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex flex-col justify-center relative pt-32">
+        <div class="absolute inset-0 w-full h-full opacity-60 pointer-events-none">
+            <canvas id="heroCanvas" class="w-full h-full"></canvas>
+        </div>
+        <div class="relative z-10">
+            <h2 class="hero-title ascii-title mono text-6xl lg:text-[80px] xl:text-[100px] font-bold leading-none mb-6">WELCOME:)<br>I'M CHRIS TAN</h2>
+            <p class="hero-subtitle ascii-title mono text-[27px] md:text-[30px] font-bold mb-12">Someone dedicated to becoming a full-stack designer.</p>
+            <a href="chris_tan_portfolio.pdf" download="chris_tan_portfolio.pdf" class="btn-download bg-black text-white border border-black px-8 py-3 mono text-sm uppercase font-black tracking-widest cursor-pointer select-none inline-block" style="margin-top: clamp(36px, 6vw, 80px);">Download Portfolio</a>
+        </div>
+        <div class="scroll-hint absolute bottom-8 right-4 md:right-8 cursor-pointer select-none z-10" onclick="document.getElementById('resume').scrollIntoView({behavior:'smooth'})">
+            <img src="scroll_down.svg" alt="Scroll Down" class="w-[48px] md:w-[64px] h-auto">
+        </div>
+    </section>
+
+    <!-- About Me Section (原 Resume Section) -->
+    <section id="resume" class="py-32 border-t border-black/10 scroll-fade">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-x-16 gap-y-12 items-start relative z-10">
+            <!-- 修改标题为 About Me -->
+            <div class="lg:col-span-1">
+                <h2 class="text-4xl font-black italic uppercase mb-4">About Me</h2>
+                <div class="mono text-[10px] opacity-40 uppercase tracking-widest">Version_2026.04 // Compiled</div>
+            </div>
+            <div class="hidden lg:block lg:col-span-3"></div>
+
+            <!-- 照片区域 -->
+            <div class="lg:col-span-1">
+                <div class="tech-border aspect-[3/4] w-full bg-gray-100/50 flex items-center justify-center overflow-hidden relative group">
+                    <span class="tech-tag">PHOTO_ID</span>
+                    <img src="photo.png" alt="Chris Tan Photo" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 space-y-20">
+                <!-- Education -->
+                <div class="tech-border p-8">
+                    <span class="tech-tag">EDUCATION</span>
+                    <div class="space-y-12">
+                        <div>
+                            <div class="flex flex-wrap justify-between items-baseline gap-4 mb-4">
+                                <h4 class="font-black text-lg">北京理工大学 <span class="font-normal opacity-50 ml-2">艺术设计 | 硕士 | 前5%</span></h4>
+                                <span class="mono text-xs opacity-60">2024.09 — 2027.06</span>
+                            </div>
+                            <p class="text-xs opacity-80 leading-relaxed uppercase tracking-wider">研究方向：人机交互与用户体验设计 | 主修：交互系统设计、用户体验设计、设计方法学等核心课程。</p>
+                        </div>
+                        <div>
+                            <div class="flex flex-wrap justify-between items-baseline gap-4 mb-4">
+                                <h4 class="font-black text-lg">中国矿业大学 <span class="font-normal opacity-50 ml-2">工业设计 | 本科 | 前5%</span></h4>
+                                <span class="mono text-xs opacity-60">2020.09 — 2024.06</span>
+                            </div>
+                            <p class="text-xs opacity-80 leading-relaxed uppercase tracking-wider">主修：设计心理学、体验与智能设计、设计调研、服务系统设计、商业创新设计等。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Experience -->
+                <div class="tech-border p-8">
+                    <span class="tech-tag">EXPERIENCE</span>
+                    <div class="space-y-12">
+                        <div>
+                            <div class="flex flex-wrap justify-between items-baseline mb-4">
+                                <h4 class="font-black text-lg">交互设计实习生 <span class="font-normal opacity-50 ml-2">司乘 C 端 | 滴滴出行</span></h4>
+                                <span class="mono text-xs opacity-60">2025.12 — 2026.06</span>
+                            </div>
+                            <p class="text-xs opacity-80 leading-relaxed">负责平台治理相关的全链路体验设计与组件库搭建维护，优化页面逻辑，并参与 Robotaxi 概念方案动效设计获滴滴大赛奖金。</p>
+                        </div>
+                        <div>
+                            <div class="flex flex-wrap justify-between items-baseline mb-4">
+                                <h4 class="font-black text-lg">UI 设计实习生 <span class="font-normal opacity-50 ml-2">企业 B 端 | 中国四维</span></h4>
+                                <span class="mono text-xs opacity-60">2025.06 — 2025.10</span>
+                            </div>
+                            <p class="text-xs opacity-80 leading-relaxed">参与“四维云通用软件” Web 端多模块 UI 重构与规范制定，利用 AI 工具构建高效的商业卫星影像资产库，大幅提升设计复用率。</p>
+                        </div>
+                        <div>
+                            <div class="flex flex-wrap justify-between items-baseline mb-4">
+                                <h4 class="font-black text-lg">UX 设计实习生 <span class="font-normal opacity-50 ml-2">企业 B 端 | 中国中车</span></h4>
+                                <span class="mono text-xs opacity-60">2025.01 — 2025.05</span>
+                            </div>
+                            <p class="text-xs opacity-80 leading-relaxed">深度参与工业企业用户访谈与痛点梳理，通过核心交互流程的精细化拆解与原型设计，为数据中心模块架构重构提供有力设计支撑。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Awards & Skills 详细回归 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="tech-border p-8">
+                        <span class="tech-tag">AWARDS_&_SCHOLARSHIP</span>
+                        <div class="space-y-10">
+                            <div>
+                                <h5 class="text-[10px] mono opacity-40 mb-4 uppercase">Awards</h5>
+                                <ul class="space-y-4 text-xs font-bold tracking-tighter leading-relaxed">
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span class="text-indigo-600">iF 设计新秀奖 / <span class="mono font-normal">iF Design Student Award</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span class="text-indigo-600">红点概念设计奖 / <span class="mono font-normal">Red Dot Design Concept</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>UXDA 国际用户体验大赛 / <span class="mono font-normal">UXDA Prize</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>戴森设计奖优秀作品奖 / <span class="mono font-normal">The James Dyson Award</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>巴黎设计奖 / <span class="mono font-normal">Paris Design Awards</span></span></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="text-[10px] mono opacity-40 mb-4 uppercase">Scholarship</h5>
+                                <ul class="space-y-4 text-xs font-bold tracking-tighter leading-relaxed">
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>研究生国家奖学金 / <span class="mono font-normal">National Graduate Scholarship</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>国家励志奖学金 / <span class="mono font-normal">National Encouragement Scholarship</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>特等学业奖学金 / <span class="mono font-normal">First-class Academic Scholarship</span></span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tech-border p-8">
+                        <span class="tech-tag">SKILLS_&_TOOLS</span>
+                        <div class="space-y-10">
+                            <div>
+                                <h5 class="text-[10px] mono opacity-40 mb-4 uppercase">Core_Capabilities</h5>
+                                <ul class="space-y-4 text-xs font-bold tracking-tighter leading-relaxed">
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>交互设计 / <span class="mono font-normal">Interaction Design</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>AI 辅助设计 / <span class="mono font-normal">AI Aided Design</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>UI 设计 / <span class="mono font-normal">UI Design</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>动效设计 / <span class="mono font-normal">Motion Design</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>平面设计 / <span class="mono font-normal">Graphic Design</span></span></li>
+                                    <li class="flex items-start gap-2"><span class="mono opacity-40">_</span><span>用户研究 / <span class="mono font-normal">User Research</span></span></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="text-[10px] mono opacity-40 mb-4 uppercase">System_Tools</h5>
+                                <div class="space-y-3">
+                                    <p class="text-xs font-bold tracking-tighter leading-relaxed">设计工具：<span class="font-normal opacity-80">Figma / MasterGo / Ps / Ae / Ai</span></p>
+                                    <p class="text-xs font-bold tracking-tighter leading-relaxed">AI 工具：<span class="font-normal opacity-80">Claude Code / Gemini / 即梦AI / Rodin</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Section -->
+    <section id="work" class="py-32 border-t border-black/10 scroll-fade">
+        <div class="px-4 mb-20">
+            <h2 class="text-4xl font-black italic uppercase mb-4">Project</h2>
+            <div class="mono text-[10px] opacity-40 uppercase tracking-widest">Case_Studies // Selected Works</div>
+        </div>
+
+        <div class="max-w-[1400px] mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 md:gap-y-24">
+                <!-- Project 01 -->
+                <div class="group">
+                    <a href="project01.html" class="block">
+                        <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-6 cursor-pointer">
+                            <span class="tech-tag">PROJ_01</span>
+                            <div class="absolute inset-0 bg-[var(--accent-color)] opacity-0 group-hover:opacity-15 transition-all duration-500 z-10"></div>
+                            <div class="absolute inset-0 flex items-center justify-center z-20 proj-overlay-text pointer-events-none">
+                                <span class="border border-black px-6 py-2.5 bg-white/90 mono text-xs md:text-sm uppercase font-black tracking-widest inline-flex items-center gap-2">
+                                    see the project
+                                    <img src="right_arrow.svg" alt="→" class="w-3.5 md:w-4 h-auto">
+                                </span>
+                            </div>
+                            <img src="project_image/project01/project01.png" alt="评价体验优化" class="w-full h-full object-cover">
+                        </div>
+                    </a>
+                    <h3 class="text-lg md:text-2xl font-medium mb-3 uppercase leading-tight">评价体验优化</h3>
+                    <p class="text-sm leading-relaxed opacity-60 mb-6">在评价模块扩充异味标签并新增音视频授权项，助力平台精细化定向治理；方案兼顾组件通用性与可扩展性。</p>
+                </div>
+
+                <!-- Project 02 -->
+                <div class="group">
+                    <a href="project02.html" class="block">
+                        <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-6 cursor-pointer">
+                            <span class="tech-tag">PROJ_02</span>
+                            <div class="absolute inset-0 bg-[var(--accent-color)] opacity-0 group-hover:opacity-15 transition-all duration-500 z-10"></div>
+                            <div class="absolute inset-0 flex items-center justify-center z-20 proj-overlay-text pointer-events-none">
+                                <span class="border border-black px-6 py-2.5 bg-white/90 mono text-xs md:text-sm uppercase font-black tracking-widest inline-flex items-center gap-2">
+                                    see the project
+                                    <img src="right_arrow.svg" alt="→" class="w-3.5 md:w-4 h-auto">
+                                </span>
+                            </div>
+                            <img src="project_image/project02/project02.png" alt="PIP考核流程设计" class="w-full h-full object-cover">
+                        </div>
+                    </a>
+                    <h3 class="text-lg md:text-2xl font-medium mb-3 uppercase leading-tight">PIP考核流程设计</h3>
+                    <p class="text-sm leading-relaxed opacity-60 mb-6">针对尾部司机考核清退引入PIP流程，解决告知不足与规则不透明问题，实现清晰告知与教育引导。</p>
+                </div>
+
+                <!-- Project 03 -->
+                <div class="group">
+                    <a href="project03.html" class="block">
+                        <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-6 cursor-pointer">
+                        <span class="tech-tag">PROJ_03</span>
+                        <div class="absolute inset-0 bg-[var(--accent-color)] opacity-0 group-hover:opacity-15 transition-all duration-500 z-10"></div>
+                        <div class="absolute inset-0 flex items-center justify-center z-20 proj-overlay-text pointer-events-none">
+                            <span class="border border-black px-6 py-2.5 bg-white/90 mono text-xs md:text-sm uppercase font-black tracking-widest inline-flex items-center gap-2">
+                                see the project
+                                <img src="right_arrow.svg" alt="→" class="w-3.5 md:w-4 h-auto">
+                            </span>
+                        </div>
+                        <img src="project_image/project03/project03.png" alt="预警规则编辑器设计" class="w-full h-full object-cover">
+                        </div>
+                    </a>
+                    <h3 class="text-lg md:text-2xl font-medium mb-3 uppercase leading-tight">预警规则编辑器设计</h3>
+                    <p class="text-sm leading-relaxed opacity-60 mb-6">"无轨列车预警规则编辑器"是中车唐山监测系统核心功能，用于列车预警管理与自定义规则编辑。本次对页面布局、交互逻辑与UI进行全面重构，已投入使用。</p>
+                </div>
+
+                <!-- Project 04 -->
+                <div class="group">
+                    <a href="project04.html" class="block">
+                        <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-6 cursor-pointer">
+                        <span class="tech-tag">PROJ_04</span>
+                        <div class="absolute inset-0 bg-[var(--accent-color)] opacity-0 group-hover:opacity-15 transition-all duration-500 z-10"></div>
+                        <div class="absolute inset-0 flex items-center justify-center z-20 proj-overlay-text pointer-events-none">
+                            <span class="border border-black px-6 py-2.5 bg-white/90 mono text-xs md:text-sm uppercase font-black tracking-widest inline-flex items-center gap-2">
+                                see the project
+                                <img src="right_arrow.svg" alt="→" class="w-3.5 md:w-4 h-auto">
+                            </span>
+                        </div>
+                        <img src="project_image/project04/project04.png" alt="组件库升级" class="w-full h-full object-cover">
+                        </div>
+                    </a>
+                    <h3 class="text-lg md:text-2xl font-medium mb-3 uppercase leading-tight">组件库升级</h3>
+                    <p class="text-sm leading-relaxed opacity-60 mb-6">对现有组件库进行迁移、整理和优化，方便团队成员使用。</p>
+                </div>
+
+            </div>
+
+            <!-- 更多项目 - 横向轮播 -->
+            <div class="mt-24 md:mt-32 pb-8 md:pb-12 scroll-fade">
+                <h3 class="text-lg md:text-2xl font-medium mb-2 uppercase leading-tight">更多项目</h3>
+                <p class="text-sm leading-relaxed opacity-60 mb-8 md:mb-12">获奖作品 / AI作品 / 日常练习等零散项目</p>
+                <div class="relative" id="carouselContainer">
+                    <div class="overflow-hidden" id="carouselViewport">
+                        <div class="flex gap-6 transition-none select-none" id="carouselTrack" style="cursor: grab;">
+                            <!-- Card 01 -->
+                            <div class="shrink-0 w-[80vw] md:w-[440px] group card01_wrapper">
+                                <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-4">
+                                    <span class="tech-tag">PROJ_05</span>
+                                    <div class="card01_slider w-full h-full relative">
+                                        <img src="project_image/project05/card01_1.png" alt="项目 05" class="card01_img absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" style="transform: translateX(0);">
+                                        <img src="" alt="" class="card01_next absolute inset-0 w-full h-full object-cover" style="transform: translateX(100%);">
+                                    </div>
+                                    <!-- 左右箭头 -->
+                                    <button class="card01_arrow absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity cursor-pointer bg-white/80" data-dir="prev">
+                                        <img src="right_arrow.svg" alt="←" class="w-4 md:w-5 h-auto -scale-x-100">
+                                    </button>
+                                    <button class="card01_arrow absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity cursor-pointer bg-white/80" data-dir="next">
+                                        <img src="right_arrow.svg" alt="→" class="w-4 md:w-5 h-auto">
+                                    </button>
+                                </div>
+                                <div class="carousel-desc">
+                                    <p class="text-sm leading-relaxed opacity-60">利用废弃手机部件组装低成本教学显微镜，为贫困地区学生提供 STEM 实验机会，缓解教育资源短缺问题。</p>
+                                </div>
+                            </div>
+                            <!-- Card 02 -->
+                            <div class="shrink-0 w-[80vw] md:w-[440px] group card02_wrapper">
+                                <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-4">
+                                    <span class="tech-tag">PROJ_06</span>
+                                    <div class="card02_slider w-full h-full relative">
+                                        <img src="project_image/project05/card02_1.png" alt="项目 06" class="card02_img absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" style="transform: translateX(0);">
+                                        <img src="" alt="" class="card02_next absolute inset-0 w-full h-full object-cover" style="transform: translateX(100%);">
+                                    </div>
+                                    <button class="card02_arrow absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity cursor-pointer bg-white/80" data-dir="prev">
+                                        <img src="right_arrow.svg" alt="←" class="w-4 md:w-5 h-auto -scale-x-100">
+                                    </button>
+                                    <button class="card02_arrow absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity cursor-pointer bg-white/80" data-dir="next">
+                                        <img src="right_arrow.svg" alt="→" class="w-4 md:w-5 h-auto">
+                                    </button>
+                                </div>
+                                <div class="carousel-desc">
+                                    <p class="text-sm leading-relaxed opacity-60">将呼吸训练与吹画结合，让孩子在创作中完成训练，通过 AI 润色与肺活量检测生成个人报告，帮助家长跟踪进展。</p>
+                                </div>
+                            </div>
+                            <!-- Card 03 (占位) -->
+                            <div class="shrink-0 w-[80vw] md:w-[440px] group card03_wrapper">
+                                <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-4">
+                                    <span class="tech-tag">PROJ_07</span>
+                                    <div class="card03_slider w-full h-full relative">
+                                        <img src="project_image/project05/card03_1.png" alt="" class="card03_img absolute inset-0 w-full h-full object-cover" style="transform: translateX(0);">
+                                        <img src="" alt="" class="card03_next absolute inset-0 w-full h-full object-cover" style="transform: translateX(100%);">
+                                    </div>
+                                    <button class="card03_arrow absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity cursor-pointer bg-white/80" data-dir="prev"><img src="right_arrow.svg" alt="←" class="w-4 md:w-5 h-auto -scale-x-100"></button>
+                                    <button class="card03_arrow absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity cursor-pointer bg-white/80" data-dir="next"><img src="right_arrow.svg" alt="→" class="w-4 md:w-5 h-auto"></button>
+                                </div>
+                                <div class="carousel-desc">
+                                    <p class="text-sm leading-relaxed opacity-60">为2025全国高校教师教学大赛设计了一套IP方案，运用AI生图、AI建模等工具快速发散，批量产出方案。</p>
+                                </div>
+                            </div>
+                            <!-- Card 04 (占位) -->
+                            <div class="shrink-0 w-[80vw] md:w-[440px] group">
+                                <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-4">
+                                    <span class="tech-tag">PROJ_08</span>
+                                    <div class="absolute inset-0 flex items-center justify-center mono text-4xl font-bold opacity-10 select-none">COMING SOON</div>
+                                </div>
+                                <div class="carousel-desc">
+                                    <p class="text-sm leading-relaxed opacity-60">敬请期待更多作品。</p>
+                                </div>
+                            </div>
+                            <!-- Card 05 (占位) -->
+                            <div class="shrink-0 w-[80vw] md:w-[440px] group">
+                                <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-4">
+                                    <span class="tech-tag">PROJ_09</span>
+                                    <div class="absolute inset-0 flex items-center justify-center mono text-4xl font-bold opacity-10 select-none">COMING SOON</div>
+                                </div>
+                                <div class="carousel-desc">
+                                    <p class="text-sm leading-relaxed opacity-60">敬请期待更多作品。</p>
+                                </div>
+                            </div>
+                            <!-- Card 06 (占位) -->
+                            <div class="shrink-0 w-[80vw] md:w-[440px] group">
+                                <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-4">
+                                    <span class="tech-tag">PROJ_10</span>
+                                    <div class="absolute inset-0 flex items-center justify-center mono text-4xl font-bold opacity-10 select-none">COMING SOON</div>
+                                </div>
+                                <div class="carousel-desc">
+                                    <p class="text-sm leading-relaxed opacity-60">敬请期待更多作品。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-desc-panel mt-3" id="carouselDescPanel">
+                        <p class="text-sm leading-relaxed opacity-60"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="about" class="py-20 mt-20 bg-black text-white -mx-4 md:-mx-8 px-4 md:px-8 -mb-4 md:-mb-8 scroll-fade">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+                <h4 class="text-6xl font-black mb-8 uppercase tracking-tighter">LET'S WORK TOGETHER.</h4>
+                <div class="border-t border-white pt-8 flex justify-between items-end gap-8">
+                    <div class="mono text-sm space-y-2">
+                        <div class="group cursor-pointer" onclick="copyEmail()"><span class="opacity-40">Email:</span> <span class="hover:bg-white hover:text-black" id="email-text">19549167170@163.com</span></div>
+                        <div><span class="opacity-40">Tel:</span> <span class="hover:bg-white hover:text-black">+86 15510012073</span></div>
+                    </div>
+                    <div class="flex items-center gap-4 shrink-0">
+                        <a href="https://github.com/chiristan6666/UX-portfolio" target="_blank" class="opacity-50 hover:opacity-100 transition-opacity"><img src="contact_icons/github-fill.svg" alt="GitHub" class="w-6 h-6 md:w-7 md:h-7"></a>
+                        <a href="https://www.xiaohongshu.com/user/profile/5fc4683d0000000001007db8" target="_blank" class="opacity-50 hover:opacity-100 transition-opacity"><img src="contact_icons/redbook.svg" alt="RedBook" class="w-6 h-6 md:w-7 md:h-7"></a>
+                        <div class="relative group inline-block">
+    <span class="cursor-pointer opacity-50 group-hover:opacity-100 transition-opacity"><img src="contact_icons/wechat.svg" alt="WeChat" class="w-6 h-6 md:w-7 md:h-7"></span>
+    <div class="absolute top-1/2 -translate-y-1/2 left-full ml-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+        <div class="bg-white p-3 shadow-lg rounded" style="width:144px;height:144px;background-image:url('contact_icons/wechat-qrcode.png');background-size:contain;background-repeat:no-repeat;background-position:center;">
+        </div>
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col justify-end items-end mono text-[10px] opacity-40"><p>© 2026 CREATED BY CHRIS TAN.</p></div>
+        </div>
+    </footer>
+
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-2 bg-black text-white mono text-xs opacity-0 transition-opacity pointer-events-none z-[2000]">COPIED_TO_CLIPBOARD</div>
+
+    <script>
+        function setupNavigation() {
+            const sections = ['home', 'resume', 'work', 'about'];
+            const navLinks = document.querySelectorAll('.nav-link');
+            const observerOptions = { threshold: 0.05, rootMargin: "-20% 0px -20% 0px" };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                        });
+                    }
+                });
+            }, observerOptions);
+            sections.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el); });
+        }
+
+        /* --- Hero 还原 4.29 版本的波浪逻辑 --- */
+        const hCanvas = document.getElementById('heroCanvas');
+        const hCtx = hCanvas.getContext('2d');
+        let hParticles = [];
+        const WAVE_CHARS = ['(', ')', '}', '{', '/', '\\', '_', '~', '≈'];
+        const FOAM_CHARS = ['*', '.', '°', '+', 'x'];
+        const hMouse = { x: -1000, y: -1000 };
+
+        function hResize() {
+            hCanvas.width = window.innerWidth; hCanvas.height = window.innerHeight;
+            hParticles = [];
+            const gapX = 18; const gapY = 25;
+            for (let r = Math.floor(hCanvas.height/gapY*0.35); r < hCanvas.height/gapY+2; r++) {
+                for (let c = 0; c < hCanvas.width/gapX+2; c++) {
+                    hParticles.push({ baseX: c*gapX, baseY: r*gapY, x: c*gapX, y: r*gapY, density: Math.random()*30+20 });
+                }
+            }
+        }
+        window.addEventListener('mousemove', e => { hMouse.x = e.clientX; hMouse.y = e.clientY; });
+
+        function hAnimate() {
+            hCtx.clearRect(0, 0, hCanvas.width, hCanvas.height);
+            let hTime = performance.now() * 0.001;
+            hParticles.forEach(p => {
+                let ty = p.baseY + Math.sin(p.baseX * 0.005 + hTime * 0.8) * 50 + Math.pow(Math.sin(p.baseX * 0.002 + hTime * 0.6), 3) * 100;
+                let dx = hMouse.x - p.x; let dy = hMouse.y - ty;
+                let d = Math.sqrt(dx*dx + dy*dy);
+                if (d < 120) { 
+                    let f = (120-d)/120; 
+                    p.x -= (dx/d)*f*p.density*0.5; 
+                    p.y = ty - (dy/d)*f*p.density; 
+                } 
+                else { 
+                    p.x += (p.baseX-p.x)*0.1; 
+                    p.y = ty; 
+                }
+                hCtx.fillStyle = p.y < p.baseY-60 ? '#4f46e5' : (Math.random()>0.3?'#000':'#4f46e5');
+                hCtx.font = p.y < p.baseY-60 ? '12px monospace' : '10px monospace';
+                hCtx.fillText(p.y < p.baseY-60 ? FOAM_CHARS[Math.floor(Math.random()*5)] : WAVE_CHARS[Math.floor((p.baseX+p.y)%9)], p.x, p.y);
+            });
+            requestAnimationFrame(hAnimate);
+        }
+
+        /* --- 更多项目轮播 --- */
+        function setupCarousel() {
+            const track = document.getElementById('carouselTrack');
+            const viewport = document.getElementById('carouselViewport');
+            if (!track || !viewport) return;
+
+            // 克隆所有卡片实现无缝循环
+            const originalCards = Array.from(track.children);
+            const totalCards = originalCards.length;
+            // 原始卡片 + 克隆一份 = 双倍长度
+            originalCards.forEach(card => {
+                track.appendChild(card.cloneNode(true));
+            });
+
+            const singleWidth = track.scrollWidth / 2; // 单组宽度
+
+            let scrollPos = 0;
+            let autoSpeed = 0.6;
+            let animationId = null;
+            let isDragging = false;
+            let isHovering = false;
+            let dragStartX = 0;
+            let dragStartScroll = 0;
+
+            function autoScroll() {
+                if (!isDragging && !isHovering) {
+                    scrollPos += autoSpeed;
+                    // 无缝循环：超过单组宽度时回跳
+                    if (scrollPos >= singleWidth) {
+                        scrollPos -= singleWidth;
+                    }
+                    track.style.transform = `translateX(${-scrollPos}px)`;
+                }
+                animationId = requestAnimationFrame(autoScroll);
+            }
+
+            viewport.addEventListener('mouseenter', () => {
+                isHovering = true;
+                track.style.cursor = 'grab';
+            });
+            viewport.addEventListener('mouseleave', () => {
+                isHovering = false;
+                isDragging = false;
+                track.style.cursor = 'grab';
+            });
+
+            track.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                dragStartX = e.clientX;
+                dragStartScroll = scrollPos;
+                track.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = dragStartX - e.clientX;
+                scrollPos = dragStartScroll + dx;
+                // 拖拽时在 0 ~ singleWidth 范围内循环
+                while (scrollPos < 0) scrollPos += singleWidth;
+                while (scrollPos >= singleWidth) scrollPos -= singleWidth;
+                track.style.transform = `translateX(${-scrollPos}px)`;
+            });
+            window.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    track.style.cursor = 'grab';
+                }
+            });
+
+            // Touch support
+            track.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                dragStartX = e.touches[0].clientX;
+                dragStartScroll = scrollPos;
+            });
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const dx = dragStartX - e.touches[0].clientX;
+                scrollPos = dragStartScroll + dx;
+                while (scrollPos < 0) scrollPos += singleWidth;
+                while (scrollPos >= singleWidth) scrollPos -= singleWidth;
+                track.style.transform = `translateX(${-scrollPos}px)`;
+            });
+            window.addEventListener('touchend', () => {
+                if (isDragging) {
+                    isDragging = false;
+                }
+            });
+
+            animationId = requestAnimationFrame(autoScroll);
+        }
+
+        /* Card 箭头滑动切换图片 (通用) */
+        function setupCardSlideshow(wrapperClass, imgClass, nextClass, arrowClass, images) {
+            document.querySelectorAll(wrapperClass).forEach(wrapper => {
+                const curImg = wrapper.querySelector(imgClass);
+                const nextImg = wrapper.querySelector(nextClass);
+                const arrows = wrapper.querySelectorAll(arrowClass);
+                if (!curImg || !nextImg) return;
+                let index = 0;
+                let switching = false;
+
+                function switchTo(nextIndex, dir) {
+                    if (switching) return;
+                    switching = true;
+                    const slideOut = dir === 'prev' ? '100%' : '-100%';
+                    const slideInStart = dir === 'prev' ? '-100%' : '100%';
+
+                    nextImg.src = images[nextIndex];
+                    nextImg.style.transition = 'none';
+                    nextImg.style.transform = `translateX(${slideInStart})`;
+
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            curImg.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                            nextImg.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                            curImg.style.transform = `translateX(${slideOut})`;
+                            nextImg.style.transform = 'translateX(0)';
+                        });
+                    });
+
+                    setTimeout(() => {
+                        curImg.src = images[nextIndex];
+                        curImg.style.transition = 'none';
+                        curImg.style.transform = 'translateX(0)';
+                        nextImg.style.transition = 'none';
+                        nextImg.style.transform = 'translateX(100%)';
+                        index = nextIndex;
+                        switching = false;
+                    }, 400);
+                }
+
+                arrows.forEach(arrow => {
+                    arrow.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const dir = arrow.dataset.dir;
+                        if (dir === 'prev') {
+                            switchTo((index - 1 + images.length) % images.length, 'prev');
+                        } else {
+                            switchTo((index + 1) % images.length, 'next');
+                        }
+                    });
+                });
+
+                wrapper.addEventListener('mouseleave', () => {
+                    if (index !== 0) {
+                        nextImg.src = images[0];
+                        nextImg.style.transition = 'none';
+                        nextImg.style.transform = 'translateX(100%)';
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                curImg.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                                nextImg.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                                curImg.style.transform = 'translateX(-100%)';
+                                nextImg.style.transform = 'translateX(0)';
+                            });
+                        });
+                        setTimeout(() => {
+                            curImg.src = images[0];
+                            curImg.style.transition = 'none';
+                            curImg.style.transform = 'translateX(0)';
+                            nextImg.style.transition = 'none';
+                            nextImg.style.transform = 'translateX(100%)';
+                            index = 0;
+                        }, 400);
+                    }
+                });
+            });
+        }
+
+        function setupCard01Slideshow() {
+            setupCardSlideshow(
+                '.card01_wrapper', '.card01_img', '.card01_next', '.card01_arrow',
+                ['project_image/project05/card01_1.png', 'project_image/project05/card01_2.png', 'project_image/project05/card01_3.png']
+            );
+        }
+
+        function setupCard02Slideshow() {
+            setupCardSlideshow(
+                '.card02_wrapper', '.card02_img', '.card02_next', '.card02_arrow',
+                ['project_image/project05/card02_1.png', 'project_image/project05/card02_2.png', 'project_image/project05/card02_3.png']
+            );
+        }
+
+        function setupCard03Slideshow() {
+            setupCardSlideshow(
+                '.card03_wrapper', '.card03_img', '.card03_next', '.card03_arrow',
+                ['project_image/project05/card03_1.png', 'project_image/project05/card03_2.png', 'project_image/project05/card03_3.png']
+            );
+        }
+
+        /* Carousel hover 文案面板 */
+        function setupCarouselDescPanel() {
+            const track = document.getElementById('carouselTrack');
+            const panel = document.getElementById('carouselDescPanel');
+            if (!track || !panel) return;
+            const panelText = panel.querySelector('p');
+
+            track.addEventListener('mouseover', (e) => {
+                const card = e.target.closest('.group');
+                if (!card) return;
+                const desc = card.querySelector('.carousel-desc p');
+                if (desc) {
+                    panelText.textContent = desc.textContent;
+                    panel.classList.add('show');
+                }
+            });
+            track.addEventListener('mouseout', (e) => {
+                const card = e.target.closest('.group');
+                if (card && !card.contains(e.relatedTarget)) {
+                    panel.classList.remove('show');
+                }
+            });
+        }
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    scrollObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.scroll-fade').forEach(el => scrollObserver.observe(el));
+
+        window.onload = () => { hResize(); hAnimate(); setupNavigation(); setupCarousel(); setupCard01Slideshow(); setupCard02Slideshow(); setupCard03Slideshow(); setupCarouselDescPanel(); };
+
+        /* 按钮渐显完成后固定 opacity，hover 时 JS 驱动晃动 */
+        const btnDownload = document.querySelector('.btn-download');
+        if (btnDownload) {
+            btnDownload.addEventListener('animationend', function(e) {
+                if (e.animationName === 'fadeIn') {
+                    btnDownload.style.opacity = '1';
+                }
+            });
+            let shakeTimer = null;
+            btnDownload.addEventListener('mouseenter', function() {
+                if (shakeTimer) return;
+                const el = this;
+                const steps = [
+                    { x: -2, r: -0.5 }, { x: 2, r: 0.5 },
+                    { x: -1, r: -0.25 }, { x: 0, r: 0 }
+                ];
+                let i = 0;
+                shakeTimer = setInterval(() => {
+                    if (i >= steps.length) {
+                        clearInterval(shakeTimer);
+                        shakeTimer = null;
+                        el.style.transform = '';
+                        return;
+                    }
+                    el.style.transform = `translateX(${steps[i].x}px) rotate(${steps[i].r}deg)`;
+                    i++;
+                }, 80);
+            });
+        }
+        window.onresize = hResize;
+        
+        function copyEmail() {
+            const email = "19549167170@163.com";
+            const tempInput = document.createElement("textarea");
+            tempInput.style.position = "absolute"; tempInput.style.left = "-9999px";
+            tempInput.value = email;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try { document.execCommand("copy"); const t = document.getElementById('toast'); t.style.opacity = 1; setTimeout(() => t.style.opacity = 0, 2000); } catch (err) { console.error('Copy failed:', err); }
+            document.body.removeChild(tempInput);
+        }
+        window.onscroll=()=>{ const s=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100; document.getElementById("progress").style.width=s+"%"; };
+    </script>
+</body>
+</html>

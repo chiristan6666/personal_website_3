@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIP考核流程设计 — Chris Tan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f8f8f8; --accent-color: #4f46e5; }
+        body { background-color: #f8f8f8; color: #000; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .tech-border { border: 1px solid rgba(0,0,0,0.1); position: relative; background-color: rgba(248,248,248,0.5); }
+        .tech-tag { position: absolute; top: -10px; left: 10px; background: var(--bg-color); padding: 0 5px; font-size: 10px; color: #999; z-index: 10; }
+        .nav-link {
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            opacity: 0.4;
+            display: inline-block;
+            color: #000000 !important;
+            text-decoration: none;
+        }
+        .nav-link:hover { opacity: 0.8; transform: scale(1.05); }
+        .btn-download {
+            background: #f8f8f8;
+            color: #000;
+            border: 1px solid #000;
+            padding: 0.6rem 1.6rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn-download:hover {
+            background: #000;
+            color: #fff;
+        }
+        @keyframes shake {
+            0%, 100% { opacity: 1; transform: translateX(0); }
+            25% { opacity: 1; transform: translateX(-2px) rotate(-0.5deg); }
+            50% { opacity: 1; transform: translateX(2px) rotate(0.5deg); }
+            75% { opacity: 1; transform: translateX(-1px) rotate(-0.25deg); }
+        }
+        @media (min-width: 768px) {
+            .btn-download { font-size: 11px; }
+        }
+        #topHeader { transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1); }
+        #topHeader.header-hidden { transform: translateY(-100%); }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1), transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .fade-in.show { opacity: 1; transform: translateY(0); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #f8f8f8; }
+        ::-webkit-scrollbar-thumb { background: #000; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- 顶部导航 -->
+    <div class="fixed top-0 left-0 w-full p-3 md:p-8 flex justify-between items-start z-[1000]" id="topHeader">
+        <a href="index.html#work" class="mono text-[10px] md:text-xs uppercase tracking-widest hover:opacity-60 transition-opacity inline-flex items-center gap-1.5 md:gap-2" style="text-decoration:none;color:inherit;"><img src="right_arrow.svg" alt="←" class="w-2.5 md:w-3 h-auto -scale-x-100"><span class="hidden md:inline">Back to Projects</span></a>
+        <nav class="flex items-start gap-2 md:gap-6 mono">
+            <a href="index.html#work" class="nav-link">
+                <div class="text-[9px] md:text-sm">PROJECT</div>
+                <div class="text-[7px] md:text-[10px] opacity-50">作品</div>
+            </a>
+            <a href="index.html#resume" class="nav-link">
+                <div class="text-[9px] md:text-sm">RESUME</div>
+                <div class="text-[7px] md:text-[10px] opacity-50">简历</div>
+            </a>
+            <a href="index.html#about" class="nav-link">
+                <div class="text-[9px] md:text-sm">CONTACT</div>
+                <div class="text-[7px] md:text-[10px] opacity-50">联系</div>
+            </a>
+            <a href="chris_tan_portfolio.pdf" download class="btn-download ml-2 md:ml-8 select-none text-[8px] md:text-[11px] px-2 py-1 md:px-6 md:py-2.5"><span class="md:hidden">PDF</span><span class="hidden md:inline">Download PDF</span></a>
+        </nav>
+    </div>
+
+    <!-- 图片展示 -->
+    <div class="max-w-5xl mx-auto pt-24 md:pt-32 pb-20 flex flex-col gap-8 md:gap-12">
+        <img src="project_image/project02/2_1.png" alt="2_1" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_2.png" alt="2_2" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_3.png" alt="2_3" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_4.png" alt="2_4" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_5.png" alt="2_5" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_6.png" alt="2_6" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_7.png" alt="2_7" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_8.png" alt="2_8" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_9.png" alt="2_9" class="w-full h-auto fade-in">
+        <img src="project_image/project02/2_10.png" alt="2_10" class="w-full h-auto fade-in">
+    </div>
+
+    <!-- Other Projects -->
+    <div class="-mx-4 md:-mx-8 py-16" style="background-color: #F3F3F2; padding-bottom: 5rem;">
+        <div class="max-w-5xl mx-auto px-4 md:px-8">
+        <h2 class="text-2xl md:text-4xl font-medium uppercase mb-8">Other Projects</h2>
+        <div class="flex items-stretch gap-3 md:gap-4" id="otherProjects">
+            <button class="op-arrow shrink-0 w-7 md:w-9 bg-white/60 flex items-center justify-center hover:bg-black transition-all group/arr z-10" onclick="slideOP(-1)"><img src="right_arrow.svg" alt="←" class="w-3 md:w-4 h-auto -scale-x-100 group-hover/arr:invert"></button>
+            <div class="overflow-hidden flex-1" id="opViewport">
+                <div class="flex gap-4" id="opTrack" style="transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1);">
+                    <a href="project01.html" class="shrink-0 w-[calc(50%-0.5rem)] group" style="text-decoration:none;color:inherit;">
+                        <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-3">
+                            <span class="tech-tag">PROJ_01</span>
+                            <div class="absolute inset-0 bg-[var(--accent-color)] opacity-0 group-hover:opacity-15 transition-all duration-500 z-10"></div>
+                            <img src="project_image/project01/project01.png" alt="评价体验优化" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-sm md:text-base font-medium uppercase leading-tight">评价体验优化</h3>
+                    </a>
+                    <a href="project03.html" class="shrink-0 w-[calc(50%-0.5rem)] group" style="text-decoration:none;color:inherit;">
+                        <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-3">
+                            <span class="tech-tag">PROJ_03</span>
+                            <div class="absolute inset-0 bg-[var(--accent-color)] opacity-0 group-hover:opacity-15 transition-all duration-500 z-10"></div>
+                            <img src="project_image/project03/project03.png" alt="预警规则编辑器设计" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-sm md:text-base font-medium uppercase leading-tight">预警规则编辑器设计</h3>
+                    </a>
+                    <a href="project04.html" class="shrink-0 w-[calc(50%-0.5rem)] group" style="text-decoration:none;color:inherit;">
+                        <div class="tech-border aspect-video bg-gray-200/50 overflow-hidden relative mb-3">
+                            <span class="tech-tag">PROJ_04</span>
+                            <div class="absolute inset-0 bg-[var(--accent-color)] opacity-0 group-hover:opacity-15 transition-all duration-500 z-10"></div>
+                            <img src="project_image/project04/project04.png" alt="组件库升级" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-sm md:text-base font-medium uppercase leading-tight">组件库升级</h3>
+                    </a>
+                </div>
+            </div>
+            <button class="op-arrow shrink-0 w-7 md:w-9 bg-white/60 flex items-center justify-center hover:bg-black transition-all group/arr z-10" onclick="slideOP(1)"><img src="right_arrow.svg" alt="→" class="w-3 md:w-4 h-auto group-hover/arr:invert"></button>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        (function() {
+            const track = document.getElementById('opTrack');
+            if (!track) return;
+            const first = track.children[0];
+            const second = track.children[1];
+            if (first) track.appendChild(first.cloneNode(true));
+            if (second) track.appendChild(second.cloneNode(true));
+        })();
+
+        let opIndex = 0;
+        function slideOP(dir) {
+            const track = document.getElementById('opTrack');
+            const card = track.querySelector('a');
+            if (!card) return;
+            const cardW = card.offsetWidth + 16;
+            const originals = track.children.length - 2;
+            const maxIdx = originals;
+
+            opIndex += dir;
+
+            track.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+            track.style.transform = `translateX(${-opIndex * cardW}px)`;
+
+            if (opIndex >= maxIdx) {
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    opIndex = 0;
+                    track.style.transform = `translateX(0px)`;
+                }, 400);
+            }
+            if (opIndex < 0) {
+                opIndex = maxIdx - 1;
+                track.style.transition = 'none';
+                track.style.transform = `translateX(${-opIndex * cardW}px)`;
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        opIndex = maxIdx - 1;
+                        track.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                        track.style.transform = `translateX(${-opIndex * cardW}px)`;
+                    });
+                });
+            }
+        }
+
+        (function() {
+            const header = document.getElementById('topHeader');
+            if (!header) return;
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                if (currentScroll <= 0) { header.classList.remove('header-hidden'); }
+                else if (currentScroll > lastScroll && currentScroll > 80) { header.classList.add('header-hidden'); }
+                else if (currentScroll < lastScroll) { header.classList.remove('header-hidden'); }
+                lastScroll = currentScroll;
+            }, { passive: true });
+        })();
+
+        document.querySelectorAll('.fade-in').forEach((el, i) => {
+            setTimeout(() => el.classList.add('show'), 100 + i * 120);
+        });
+
+        const btn = document.querySelector('.btn-download');
+        if (btn) {
+            let shakeTimer = null;
+            btn.addEventListener('mouseenter', function() {
+                if (shakeTimer) return;
+                const el = this;
+                const steps = [
+                    { x: -2, r: -0.5 }, { x: 2, r: 0.5 },
+                    { x: -1, r: -0.25 }, { x: 0, r: 0 }
+                ];
+                let i = 0;
+                shakeTimer = setInterval(() => {
+                    if (i >= steps.length) {
+                        clearInterval(shakeTimer);
+                        shakeTimer = null;
+                        el.style.transform = '';
+                        return;
+                    }
+                    el.style.transform = `translateX(${steps[i].x}px) rotate(${steps[i].r}deg)`;
+                    i++;
+                }, 80);
+            });
+        }
+    </script>
+</body>
+</html>
